@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from core.serializers import RegisterSerializer
+
+from core.serializers import RegisterSerializer, LoginSerializer
+
 from core.models import User    
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
@@ -9,7 +11,7 @@ from rest_framework import status
 # # Create your views here.
 
 class RegisterViewset(ModelViewSet):
-    http_method_names = ['get', 'post', 'put']
+    http_method_names = ['get', 'post']
     serializer_class = RegisterSerializer
     # permission_classes = [All]
     def get_queryset(self):
@@ -29,3 +31,13 @@ class RegisterViewset(ModelViewSet):
             'User' : serializer.data,
             'Access Token': str(access_token)
         }, status=status.HTTP_201_CREATED)
+
+
+class LoginViewset(ModelViewSet):
+
+    http_method_names = ['post']
+    serializer_class = LoginSerializer
+
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     return User.objects.filter(user=user)

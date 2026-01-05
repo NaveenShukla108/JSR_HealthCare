@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ViewSet
 
 from core.serializers import RegisterSerializer, LoginSerializer
 
@@ -33,11 +33,26 @@ class RegisterViewset(ModelViewSet):
         }, status=status.HTTP_201_CREATED)
 
 
-class LoginViewset(ModelViewSet):
+class LoginViewset(ViewSet):
 
-    http_method_names = ['post']
     serializer_class = LoginSerializer
 
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     return User.objects.filter(user=user)
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data["user"]
+
+        refreshToken = RefreshToken.for_user(user=user)
+        accessToken = refreshToken.access_token
+
+        return Response(
+            {
+                "user" : {
+                    "refresh_token" : str(refreshToken),
+                    "access_token" : str(accessToken),
+                    "role" : user.role
+                }
+            },
+            status=status.HTTP_200_OK
+        )

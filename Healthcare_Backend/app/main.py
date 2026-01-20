@@ -1,8 +1,12 @@
 from fastapi import FastAPI
-from app.core.database import engine
 from sqlalchemy import text
 
+from app.core.database import engine, Base
+from app.appointments.models import Appointment
+
 app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
 
 @app.get("/health")
 def health_check():
